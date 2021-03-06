@@ -2,6 +2,7 @@ package dhbw.demo.filter_db;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -19,7 +20,7 @@ public class DocumentEntity implements Serializable {
     private String path;
 
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
-    private Set<MetaDataEntity> metaData;
+    private Set<MetaDataEntity> metaData = new HashSet<>();
 
     public DocumentEntity() {
     }
