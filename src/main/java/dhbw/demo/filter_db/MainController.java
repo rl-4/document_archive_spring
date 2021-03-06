@@ -4,36 +4,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.FileNotFoundException;
 import java.util.List;
 
 @RestController
 public class MainController {
     @Autowired
-    private DocumentArchiveRepository repository;
+    private DocumentRepository documentArchiveRepository;
+
+    @Autowired
+    private MetaDataRepository metaDataRepository;
 
     @GetMapping("/test")
-    public String getDocumentData() throws FileNotFoundException {
+    public String getDocumentData() {
         //create new document
-        DocumentEntity test_document = new DocumentEntity();
-        test_document.name = "Test.docx";
-        //test_document.documentFile = new File("src/test/java/test_resources/Test.docx");
-        this.repository.save(test_document);
+        DocumentEntity test_document = new DocumentEntity("Test.docx", "test/Test.docx");
 
-        List<DocumentEntity> documentEntities = this.repository.findByNameContaining("Test");
-        if (documentEntities.isEmpty()) {
-            return "No entries";
+        //save document
+        this.documentArchiveRepository.save(test_document);
+
+        //create and save new metaData
+        this.metaDataRepository.save(new MetaDataEntity("Author", "Tolstoi", test_document));
+        this.metaDataRepository.save(new MetaDataEntity("Published", "1.1.2000", test_document));
+
+        List<MetaDataEntity> metaDataEntities = metaDataRepository.findByKeyAndValue("Author", "Tolstoi");
+        if (!metaDataEntities.isEmpty()){
+            metaDataEntities.forEach(metaDataEntity -> System.out.println(metaDataEntity.toString()));
         }
-        String documentData = documentEntities.get(0).id + ": " + documentEntities.get(0).name;
 
-        /*
-        File testFile = documentEntities.get(0).documentFile;
-        WordTextExtractor textExtractor = new WordTextExtractor();
-        String content = textExtractor.extractText(testFile);
-        System.out.println(content);
-         */
-
-        System.out.println(documentData);
-        return documentData;
+        return "alright";
     }
 }

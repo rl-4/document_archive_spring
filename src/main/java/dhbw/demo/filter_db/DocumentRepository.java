@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface DocumentArchiveRepository extends JpaRepository<DocumentEntity, Integer> {
+public interface DocumentRepository extends JpaRepository<DocumentEntity, Integer> {
     List<DocumentEntity> findByNameContaining(String name);
 }
