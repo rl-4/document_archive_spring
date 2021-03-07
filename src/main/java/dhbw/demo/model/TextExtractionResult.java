@@ -1,6 +1,5 @@
 package dhbw.demo.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Arrays;
@@ -17,12 +16,6 @@ public class TextExtractionResult {
     @JsonProperty("extractedCells")
     public String[] extractedCells;
 
-    public TextExtractionResult(int document_id, String extractedText, String[] extractedCells) {
-        this.document_id = document_id;
-        this.extractedText = extractedText;
-        this.extractedCells = extractedCells;
-    }
-
     public TextExtractionResult(int document_id, String extractedText) {
         this.document_id = document_id;
         this.extractedText = extractedText;
@@ -33,7 +26,7 @@ public class TextExtractionResult {
         this.extractedCells = extractedCells;
     }
 
-    public TextExtractionResult(){
+    public TextExtractionResult() {
 
     }
 

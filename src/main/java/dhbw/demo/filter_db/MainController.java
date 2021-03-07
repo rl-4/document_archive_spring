@@ -1,12 +1,11 @@
 package dhbw.demo.filter_db;
 
-import dhbw.demo.json.Parser;
+import dhbw.demo.model.*;
+import dhbw.demo.text_search.FilterDocumentsByFullTextSearch;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -20,23 +19,37 @@ public class MainController {
     @Autowired
     private MetaDataRepository metaDataRepository;
 
-    private Parser parser;
-
-    public MainController() {
-        parser = new Parser();
-    }
-
     @GetMapping("/test")
     public String getDocumentData() {
         return "alright";
     }
 
-    @GetMapping("/fullTextSearch")
-    public ResponseEntity getAllDocumentsMatchingKeyValuePairs() {
-        //Map<String, String> keyValuePairs = parser.parse();
-        //List<DocumentEntity> matchingDocuments = getAllDocumentsMatchingKeyValuePairs(keyValuePairs);
-        return new ResponseEntity("Test", HttpStatus.OK);
-        // document.path -> IO -> TextExtraction -> extracted String / String[]
+    @PostMapping("/fullTextSearch")
+    @ResponseBody
+    public List<DocumentMetaDataDto> getAllDocumentsMatchingKeyValuePairs(@RequestBody FilterQuery filterQuery) {
+        boolean regExMatch = filterQuery.regExMatch;
+        String searchQuery = filterQuery.searchQuery;
+        Map<String, String> keyValuePairs = filterQuery.keyValuePairs;
+
+        List<DocumentEntity> matchingDocuments = getAllDocumentsMatchingKeyValuePairs(keyValuePairs);
+
+        //send paths to TextExtractor
+        MatchingDocumentsWrapper matchingDocumentsWrapper = mapMatchingDocumentsToMatchingDocumentsWrapper(matchingDocuments);
+
+        //TODO get TextExtractionResults
+        TextExtractionResultWrapper textExtractionResultWrapper = null;
+
+        //fullTextSearch in TextExtractionResults
+        //-> ids
+        int[] filtered_document_ids = FilterDocumentsByFullTextSearch.filterDocumentsByFullTextSearch(regExMatch, textExtractionResultWrapper, searchQuery);
+
+        //fullTextSearchResult -> Select * From documents
+        List<DocumentEntity> filteredDocuments = documentRepository.findByIdIn(filtered_document_ids);
+
+        //DataTransferObject
+        List<DocumentMetaDataDto> documentMetaDataDtos = convertDocumentEntitiesToDocumentMetaDataDtoList(filteredDocuments);
+
+        return documentMetaDataDtos;
     }
 
     private List<DocumentEntity> getAllDocumentsMatchingKeyValuePairs(Map<String, String> keyValuePairs) {
@@ -44,5 +57,25 @@ public class MainController {
         List<DocumentEntity> matchingDocuments = documentRepository.findAll().stream().filter(matchesKeyValuePairs).collect(Collectors.toList());
 
         return matchingDocuments;
+    }
+
+    private MatchingDocumentsWrapper mapMatchingDocumentsToMatchingDocumentsWrapper(List<DocumentEntity> matchingDocuments) {
+        List<MatchingDocument> matchingDocumentDtos = new ArrayList<>();
+        for (DocumentEntity matchingDocument : matchingDocuments) {
+            MatchingDocument matchingDocumentDto = new MatchingDocument(matchingDocument.getId(), matchingDocument.getPath());
+            matchingDocumentDtos.add(matchingDocumentDto);
+        }
+        //TODO cast works?
+        return new MatchingDocumentsWrapper(matchingDocumentDtos.toArray(MatchingDocument[]::new));
+    }
+
+    private DocumentMetaDataDto convertDocumentEntityToDocumentMetaDataDto(DocumentEntity document) {
+        //TODO return all  keyValuePairs?
+        Map<String, String> allKeyValuePairs = document.getMetaData().stream().collect(Collectors.toMap(MetaDataEntity::getKey, MetaDataEntity::getValue));
+        return new DocumentMetaDataDto(document.getName(), document.getPath(), allKeyValuePairs);
+    }
+
+    private List<DocumentMetaDataDto> convertDocumentEntitiesToDocumentMetaDataDtoList(List<DocumentEntity> filteredDocuments) {
+        return filteredDocuments.stream().map(this::convertDocumentEntityToDocumentMetaDataDto).collect(Collectors.toList());
     }
 }

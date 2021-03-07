@@ -29,9 +29,8 @@ public class FullTextSearch {
 
 
     public static boolean textMatchesRegExSubString(String[] textCells, String searchedString){
-        String regExString = WildcardEvaluator.createRegexForSubString(searchedString);
         for (String textCell : textCells){
-            if (textCell.matches(regExString)){
+            if (textMatchesRegExSubString(textCell, searchedString)){
                 return true;
             }
         }
@@ -40,5 +39,14 @@ public class FullTextSearch {
 
     public static boolean textMatchesRegExSubString(String[] textCells, List<String> searchedStrings){
         return searchedStrings.stream().allMatch(searchedString -> textMatchesRegExSubString(textCells, searchedString));
+    }
+
+    public static boolean textContainsLiteralSubstring(String[] textCells, String searchedString) {
+        for (String textCell : textCells){
+            if (textContainsLiteralSubstring(textCell, searchedString)){
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface DocumentRepository extends JpaRepository<DocumentEntity, Integer> {
     List<DocumentEntity> findByNameContaining(String name);
+
+    List<DocumentEntity> findByIdIn(int[] ids);
 }
