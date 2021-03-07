@@ -1,11 +1,16 @@
 package dhbw.demo.filter_db;
 
+import dhbw.demo.httpSearch.HttpSearch;
+import dhbw.demo.json.Parser;
 import dhbw.demo.model.*;
 import dhbw.demo.text_search.FilterDocumentsByFullTextSearch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -19,9 +24,12 @@ public class MainController {
     @Autowired
     private MetaDataRepository metaDataRepository;
 
-    @GetMapping("/test")
-    public String getDocumentData() {
-        return "alright";
+    private final HttpSearch httpSearch;
+    private final Parser parser;
+
+    public MainController(){
+        parser = new Parser();
+        httpSearch = new HttpSearch();
     }
 
     @PostMapping("/fullTextSearch")
@@ -36,8 +44,17 @@ public class MainController {
         //send paths to TextExtractor
         MatchingDocumentsWrapper matchingDocumentsWrapper = mapMatchingDocumentsToMatchingDocumentsWrapper(matchingDocuments);
 
-        //TODO get TextExtractionResults
+        //get ids
+        String ids = Arrays.stream(matchingDocumentsWrapper.matchingDocuments).map(matchingDocument -> String.valueOf(matchingDocument.document_id)).collect(Collectors.joining(",")).toString();
+        HttpResponse<String> response = null;
         TextExtractionResultWrapper textExtractionResultWrapper = null;
+        try{
+            response = httpSearch.search(new URI("localhost:8081/api/getTexts?ids=[" + ids + "]"));
+            String json = response.body();
+            textExtractionResultWrapper = parser.readJsonTextExtractionResultWrapper(json);
+        } catch (Exception e){
+            //TODO give back specific status code
+        }
 
         //fullTextSearch in TextExtractionResults
         //-> ids
@@ -70,7 +87,7 @@ public class MainController {
     }
 
     private DocumentMetaDataDto convertDocumentEntityToDocumentMetaDataDto(DocumentEntity document) {
-        //TODO return all  keyValuePairs?
+        //TODO return all keyValuePairs?
         Map<String, String> allKeyValuePairs = document.getMetaData().stream().collect(Collectors.toMap(MetaDataEntity::getKey, MetaDataEntity::getValue));
         return new DocumentMetaDataDto(document.getName(), document.getPath(), allKeyValuePairs);
     }
