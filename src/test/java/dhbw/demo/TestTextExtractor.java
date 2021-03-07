@@ -31,7 +31,7 @@ public class TestTextExtractor {
         String filePath = "src" + separator + "test" + separator + "java" + separator + "test_resources" + separator + "Test.xlsx";
         String[] extractedText = textExtractor.extractText(filePath);
 
-        String[] expectedFileContent = new String[]{"Test","1.0","2.0","3.0","4.0","5.0","test"};
+        String[] expectedFileContent = new String[]{"Test","1.0","2.0","3.0","5.0","test","4.0"};
 
         Assertions.assertArrayEquals(expectedFileContent, extractedText);
     }

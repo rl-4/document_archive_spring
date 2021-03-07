@@ -9,8 +9,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.FileInputStream;
 import java.util.Iterator;
 
-public class ExcelTextExtractor{
-    //TODO to array, no null cells
+public class ExcelTextExtractor {
 
     private String errorMessage = "Text could not be extracted";
 
@@ -39,23 +38,25 @@ public class ExcelTextExtractor{
                             case STRING:
                                 cellValue = nextCell.getStringCellValue();
                                 stringBuilder.append(cellValue);
+                                stringBuilder.append(";");
                                 break;
                             case BOOLEAN:
                                 cellValue = String.valueOf(nextCell.getBooleanCellValue());
                                 stringBuilder.append(cellValue);
+                                stringBuilder.append(";");
                                 break;
                             case NUMERIC:
                                 cellValue = String.valueOf(nextCell.getNumericCellValue());
                                 stringBuilder.append(cellValue);
+                                stringBuilder.append(";");
+                                break;
+                            default:
                                 break;
                         }
-                        stringBuilder.append(";");
                     }
                 }
-
                 fileInputStream.close();
             }
-
         } catch (Exception e) {
             throw new RuntimeException(errorMessage);
         }
