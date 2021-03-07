@@ -7,7 +7,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 
 public class HttpSearch {
-    public HttpResponse<String> search(URI uri){
+    public HttpResponse<String> search(URI uri) {
 
         try {
             HttpClient client = HttpClient.newBuilder()

@@ -7,7 +7,7 @@ import dhbw.demo.model.MatchingDocumentsWrapper;
 import dhbw.demo.model.TextExtractionResultWrapper;
 
 public class Parser {
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public TextExtractionResultWrapper readJsonTextExtractionResultWrapper(String json) throws JsonProcessingException {
         return objectMapper.readValue(json, TextExtractionResultWrapper.class);

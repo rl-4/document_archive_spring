@@ -11,7 +11,7 @@ import java.util.Iterator;
 
 public class ExcelTextExtractor {
 
-    private String errorMessage = "Text could not be extracted";
+    private final String errorMessage = "Text could not be extracted";
 
     public String[] extractText(String path) {
         StringBuilder stringBuilder = new StringBuilder();

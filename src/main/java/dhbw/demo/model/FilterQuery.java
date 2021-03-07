@@ -17,7 +17,7 @@ public class FilterQuery {
     @JsonProperty("keyValuePairs")
     public Map<String, String> keyValuePairs = new HashMap<>();
 
-    public FilterQuery(){
+    public FilterQuery() {
 
     }
 

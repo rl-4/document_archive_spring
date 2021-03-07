@@ -3,13 +3,12 @@ package dhbw.demo.text_extractor;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 
-import java.io.File;
 import java.io.FileInputStream;
 
-public class WordTextExtractor{
-    private String errorMessage = "Text could not be extracted";
+public class WordTextExtractor {
+    private final String errorMessage = "Text could not be extracted";
 
-    public String extractText(String path){
+    public String extractText(String path) {
         try {
             FileInputStream fileInputStream = new FileInputStream(path);
             XWPFDocument wordDocument = new XWPFDocument(fileInputStream);
@@ -18,8 +17,7 @@ public class WordTextExtractor{
 
             fileInputStream.close();
             return extractedText;
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(errorMessage);
         }
     }

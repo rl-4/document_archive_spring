@@ -21,7 +21,7 @@ public class MetaDataEntity implements Serializable {
     @JoinColumn(name = "document_id", nullable = false)
     private DocumentEntity document;
 
-    public MetaDataEntity(){
+    public MetaDataEntity() {
 
     }
 

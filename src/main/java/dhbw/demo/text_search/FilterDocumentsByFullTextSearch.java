@@ -7,24 +7,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FilterDocumentsByFullTextSearch {
-    public static int[] filterDocumentsByFullTextSearch(boolean regExMatch, TextExtractionResultWrapper textExtractionResultWrapper, String searchQuery){
+    public static int[] filterDocumentsByFullTextSearch(boolean regExMatch, TextExtractionResultWrapper textExtractionResultWrapper, String searchQuery) {
         TextExtractionResult[] textExtractionResults = textExtractionResultWrapper.textExtractionResults;
 
         List<Integer> filtered_document_ids = new ArrayList<>();
-        for (TextExtractionResult textExtractionResult : textExtractionResults){
+        for (TextExtractionResult textExtractionResult : textExtractionResults) {
             String extractedText = textExtractionResult.extractedText;
             String[] extractedCells = textExtractionResult.extractedCells;
 
             boolean textMatchesSearch;
             //TODO refactor multiple if else
-            if (extractedText != null){
-                if (regExMatch){
+            if (extractedText != null) {
+                if (regExMatch) {
                     textMatchesSearch = FullTextSearch.textMatchesRegExSubString(extractedText, searchQuery);
                 } else {
                     textMatchesSearch = FullTextSearch.textContainsLiteralSubstring(extractedText, searchQuery);
                 }
-            } else if (extractedCells != null){
-                if (regExMatch){
+            } else if (extractedCells != null) {
+                if (regExMatch) {
                     textMatchesSearch = FullTextSearch.textMatchesRegExSubString(extractedCells, searchQuery);
                 } else {
                     textMatchesSearch = FullTextSearch.textContainsLiteralSubstring(extractedCells, searchQuery);
@@ -32,7 +32,7 @@ public class FilterDocumentsByFullTextSearch {
             } else {
                 throw new RuntimeException("No extracted text");
             }
-            if (textMatchesSearch){
+            if (textMatchesSearch) {
                 filtered_document_ids.add(textExtractionResult.document_id);
             }
         }
