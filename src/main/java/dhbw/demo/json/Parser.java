@@ -2,6 +2,7 @@ package dhbw.demo.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dhbw.demo.model.FilterQuery;
 import dhbw.demo.model.MatchingDocumentsWrapper;
 import dhbw.demo.model.TextExtractionResultWrapper;
 
@@ -26,5 +27,15 @@ public class Parser {
         String test = objectMapper.writeValueAsString(matchingDocumentsWrapper);
         System.out.println(test);
         return test;
+    }
+
+    public String filterQueryToJson(FilterQuery filterQuery) throws JsonProcessingException {
+        String json = objectMapper.writeValueAsString(filterQuery);
+        System.out.println(json);
+        return json;
+    }
+
+    public FilterQuery jsonToFilterQuery(String json) throws JsonProcessingException {
+        return objectMapper.readValue(json, FilterQuery.class);
     }
 }

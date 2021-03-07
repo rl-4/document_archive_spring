@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Arrays;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class MatchingDocumentsWrapper {
     @JsonProperty("matchingDocuments")
     public MatchingDocument[] matchingDocuments;

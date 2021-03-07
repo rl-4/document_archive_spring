@@ -1,13 +1,13 @@
 package dhbw.demo;
 
 import dhbw.demo.json.Parser;
-import dhbw.demo.model.MatchingDocument;
-import dhbw.demo.model.MatchingDocumentsWrapper;
-import dhbw.demo.model.TextExtractionResult;
-import dhbw.demo.model.TextExtractionResultWrapper;
+import dhbw.demo.model.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class TestJsonParser {
     private Parser parser;
@@ -89,5 +89,42 @@ public class TestJsonParser {
         TextExtractionResultWrapper expectedTextExtractionResultWrapper = new TextExtractionResultWrapper(textExtractionResults);
 
         Assertions.assertTrue(expectedTextExtractionResultWrapper.equals(actualTextExtractionResultWrapper));
+    }
+
+    @Test
+    public void testFilterQueryToJson(){
+        Map<String, String> keyValuePairs = new HashMap<>();
+        keyValuePairs.put("Author", "A");
+        keyValuePairs.put("Published", "B");
+        FilterQuery filterQuery = new FilterQuery(true, keyValuePairs);
+
+        String actualJson = null;
+        try{
+            actualJson = parser.filterQueryToJson(filterQuery);
+        } catch (Exception e){
+            Assertions.fail();
+        }
+
+        String expectedJson = "{\"regExMatch\":true,\"keyValuePairs\":{\"Author\":\"A\",\"Published\":\"B\"}}";
+
+        Assertions.assertEquals(expectedJson, actualJson);
+    }
+
+    @Test
+    public void testJsonToFilterQuery(){
+        String json = "{\"regExMatch\":true,\"keyValuePairs\":{\"Author\":\"A\",\"Published\":\"B\"}}";
+        FilterQuery actualFilterQuery = null;
+        try{
+            actualFilterQuery = parser.jsonToFilterQuery(json);
+        }catch (Exception e){
+            Assertions.fail();
+        }
+
+        Map<String, String> keyValuePairs = new HashMap<>();
+        keyValuePairs.put("Author", "A");
+        keyValuePairs.put("Published", "B");
+        FilterQuery expectedFilterQuery = new FilterQuery(true, keyValuePairs);
+
+        Assertions.assertTrue(expectedFilterQuery.equals(actualFilterQuery));
     }
 }

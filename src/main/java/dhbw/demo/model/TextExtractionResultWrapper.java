@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Arrays;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class TextExtractionResultWrapper {
     @JsonProperty("textExtractionResults")
     public TextExtractionResult[] textExtractionResults;

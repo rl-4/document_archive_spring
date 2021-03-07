@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Arrays;
 import java.util.Objects;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class TextExtractionResult {
 
     @JsonProperty("document_id")
