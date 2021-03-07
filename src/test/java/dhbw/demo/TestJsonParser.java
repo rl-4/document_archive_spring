@@ -38,7 +38,6 @@ public class TestJsonParser {
 
     @Test
     public void testWriteTextExtractionResultWrapper() {
-        /*
         //create test objects
         TextExtractionResult textExtractionResult1 = new TextExtractionResult(1,"Test");
         TextExtractionResult textExtractionResult2 = new TextExtractionResult(1, new String[]{"1.0", "Test"});
@@ -52,16 +51,13 @@ public class TestJsonParser {
         } catch (Exception e) {
             Assertions.fail();
         }
-        String expectedJson = "{\"textExtractionResults\":[{\"document_id\":1,\"extractedText\":\"Test\",\"extractedCells\":null},{\"document_id\":1,\"extractedText\":null,\"extractedCells\":[\"1.0\",\"Test\"]}]}\n";
+        String expectedJson = "{\"textExtractionResults\":[{\"document_id\":1,\"extractedText\":\"Test\",\"extractedCells\":null},{\"document_id\":1,\"extractedText\":null,\"extractedCells\":[\"1.0\",\"Test\"]}]}";
         Assertions.assertEquals(expectedJson, actualJson);
-
-         */
     }
 
     @Test
     public void testReadJsonMatchingDocumentsWrapper() {
-        /*
-        String json = "{\"textExtractionResults\":[{\"document_id\":1,\"extractedText\":\"Test\",\"extractedCells\":[]},{\"document_id\":1,\"extractedText\":\"\",\"extractedCells\":[\"1.0\",\"Test\"]}]}";
+        String json = "{\"matchingDocuments\":[{\"document_id\":1,\"path\":\"Test/Test.docx\"},{\"document_id\":2,\"path\":\"Test/Test2.docx\"}]}";
         MatchingDocumentsWrapper actualMatchingDocumentsWrapper = null;
         try{
             actualMatchingDocumentsWrapper = parser.readJsonMatchingDocumentsWrapper(json);
@@ -74,13 +70,24 @@ public class TestJsonParser {
         MatchingDocument[] matchingDocuments = new MatchingDocument[]{matchingDocument1, matchingDocument2};
         MatchingDocumentsWrapper expectedMatchingDocumentsWrapper = new MatchingDocumentsWrapper(matchingDocuments);
 
-        Assertions.assertEquals(expectedMatchingDocumentsWrapper, actualMatchingDocumentsWrapper);
-
-         */
+        Assertions.assertTrue(expectedMatchingDocumentsWrapper.equals(actualMatchingDocumentsWrapper));
     }
 
     @Test
     public void testReadTextExtractionResultWrapper() {
+        String json = "{\"textExtractionResults\":[{\"document_id\":1,\"extractedText\":\"Test\",\"extractedCells\":null},{\"document_id\":1,\"extractedText\":null,\"extractedCells\":[\"1.0\",\"Test\"]}]}";
+        TextExtractionResultWrapper actualTextExtractionResultWrapper = null;
+        try{
+            actualTextExtractionResultWrapper = parser.readJsonTextExtractionResultWrapper(json);
+        } catch (Exception e){
+            Assertions.fail();
+        }
 
+        TextExtractionResult textExtractionResult1 = new TextExtractionResult(1,"Test");
+        TextExtractionResult textExtractionResult2 = new TextExtractionResult(1, new String[]{"1.0", "Test"});
+        TextExtractionResult[] textExtractionResults = new TextExtractionResult[]{textExtractionResult1, textExtractionResult2};
+        TextExtractionResultWrapper expectedTextExtractionResultWrapper = new TextExtractionResultWrapper(textExtractionResults);
+
+        Assertions.assertTrue(expectedTextExtractionResultWrapper.equals(actualTextExtractionResultWrapper));
     }
 }
