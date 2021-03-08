@@ -44,7 +44,7 @@ public class MainController {
         HttpResponse<String> response;
         TextExtractionResultWrapper textExtractionResultWrapper = null;
         try {
-            URI uri = new URI("http://localhost:8081/api/getTexts/" + ids);
+            URI uri = new URI("http://fileservice:8081/api/getTexts/" + ids);
             response = httpSearch.search(uri);
             String json = response.body();
             textExtractionResultWrapper = parser.readJsonTextExtractionResultWrapper(json);

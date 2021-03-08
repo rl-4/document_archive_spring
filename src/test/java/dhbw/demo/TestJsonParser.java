@@ -128,6 +128,5 @@ public class TestJsonParser {
         FilterQuery expectedFilterQuery = new FilterQuery(true, searchQuery, keyValuePairs);
 
         Assertions.assertTrue(expectedFilterQuery.equals(actualFilterQuery));
-
     }
 }
