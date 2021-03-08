@@ -93,11 +93,11 @@ public class TestJsonParser {
 
     @Test
     public void testFilterQueryToJson(){
-        /*
         Map<String, String> keyValuePairs = new HashMap<>();
         keyValuePairs.put("Author", "A");
         keyValuePairs.put("Published", "B");
-        FilterQuery filterQuery = new FilterQuery(true, keyValuePairs);
+        String searchQuery = "Test";
+        FilterQuery filterQuery = new FilterQuery(true, searchQuery, keyValuePairs);
 
         String actualJson = null;
         try{
@@ -106,17 +106,14 @@ public class TestJsonParser {
             Assertions.fail();
         }
 
-        String expectedJson = "{\"regExMatch\":true,\"keyValuePairs\":{\"Author\":\"A\",\"Published\":\"B\"}}";
+        String expectedJson = "{\"regExMatch\":true,\"searchQuery\":\"Test\",\"keyValuePairs\":{\"Author\":\"A\",\"Published\":\"B\"}}";
 
         Assertions.assertEquals(expectedJson, actualJson);
-
-         */
     }
 
     @Test
     public void testJsonToFilterQuery(){
-        /*
-        String json = "{\"regExMatch\":true,\"keyValuePairs\":{\"Author\":\"A\",\"Published\":\"B\"}}";
+        String json = "{\"regExMatch\":true,\"searchQuery\":\"Test\",\"keyValuePairs\":{\"Author\":\"A\",\"Published\":\"B\"}}";
         FilterQuery actualFilterQuery = null;
         try{
             actualFilterQuery = parser.jsonToFilterQuery(json);
@@ -127,10 +124,10 @@ public class TestJsonParser {
         Map<String, String> keyValuePairs = new HashMap<>();
         keyValuePairs.put("Author", "A");
         keyValuePairs.put("Published", "B");
-        FilterQuery expectedFilterQuery = new FilterQuery(true, keyValuePairs);
+        String searchQuery = "Test";
+        FilterQuery expectedFilterQuery = new FilterQuery(true, searchQuery, keyValuePairs);
 
         Assertions.assertTrue(expectedFilterQuery.equals(actualFilterQuery));
 
-         */
     }
 }

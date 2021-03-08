@@ -6,9 +6,10 @@ import dhbw.demo.model.*;
 import dhbw.demo.text_search.FilterDocumentsByFullTextSearch;
 import dhbw.demo.text_search.FullTextSearch;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
@@ -26,9 +27,8 @@ public class MainController {
     @Autowired
     private MetaDataRepository metaDataRepository;
 
-    @PostMapping("/fullTextSearch")
-    @ResponseBody
-    public List<DocumentMetaDataDto> getAllDocumentsMatchingKeyValuePairs(@RequestBody FilterQuery filterQuery) {
+    @PostMapping(value = "/fullTextSearch", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<DocumentMetaDataDto>> getAllDocumentsMatchingKeyValuePairs(@RequestBody FilterQuery filterQuery) {
         boolean regExMatch = filterQuery.regExMatch;
         String searchQuery = filterQuery.searchQuery;
         Map<String, String> keyValuePairs = filterQuery.keyValuePairs;
@@ -48,6 +48,7 @@ public class MainController {
             textExtractionResultWrapper = parser.readJsonTextExtractionResultWrapper(json);
         } catch (Exception e) {
             //TODO give back specific status code
+            return ResponseEntity.badRequest().body(null);
         }
 
         //fullTextSearch in TextExtractionResults
@@ -57,13 +58,16 @@ public class MainController {
         //fullTextSearchResult -> Select * From documents
         List<DocumentEntity> filteredDocuments = documentRepository.findByIdIn(filtered_document_ids);
 
-        List<DocumentEntity> nameMatchingDocuments = this.documentRepository.findAll().stream().filter(document -> FullTextSearch.textMatchesRegExSubString(document.getName(), searchQuery)).collect(Collectors.toList());
+        //TODO literal match
+
+        List<DocumentEntity> nameMatchingDocuments = getNameMatchingDocuments(regExMatch, searchQuery);
 
         filteredDocuments.addAll(nameMatchingDocuments);
         List<DocumentEntity> sortedDocuments = filteredDocuments.stream().sorted(Comparator.comparing(DocumentEntity::getName)).collect(Collectors.toList());
 
         //DataTransferObject
-        return convertDocumentEntitiesToDocumentMetaDataDtoList(sortedDocuments);
+        List<DocumentMetaDataDto> documentMetaDataDTOs = convertDocumentEntitiesToDocumentMetaDataDtoList(sortedDocuments);
+        return ResponseEntity.ok(documentMetaDataDTOs);
     }
 
     private List<DocumentEntity> getAllDocumentsMatchingKeyValuePairs(Map<String, String> keyValuePairs) {
@@ -90,5 +94,13 @@ public class MainController {
 
     private List<DocumentMetaDataDto> convertDocumentEntitiesToDocumentMetaDataDtoList(List<DocumentEntity> filteredDocuments) {
         return filteredDocuments.stream().map(this::convertDocumentEntityToDocumentMetaDataDto).collect(Collectors.toList());
+    }
+
+    private List<DocumentEntity> getNameMatchingDocuments(boolean regExMatch, String searchQuery) {
+        if (regExMatch) {
+            return this.documentRepository.findAll().stream().filter(document -> FullTextSearch.textMatchesRegExSubString(document.getName(), searchQuery)).collect(Collectors.toList());
+        } else {
+            return this.documentRepository.findAll().stream().filter(document -> FullTextSearch.textContainsLiteralSubstring(document.getName(), searchQuery)).collect(Collectors.toList());
+        }
     }
 }
