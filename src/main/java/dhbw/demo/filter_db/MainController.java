@@ -63,7 +63,7 @@ public class MainController {
         List<DocumentEntity> nameMatchingDocuments = getNameMatchingDocuments(regExMatch, searchQuery);
 
         filteredDocuments.addAll(nameMatchingDocuments);
-        List<DocumentEntity> sortedDocuments = filteredDocuments.stream().sorted(Comparator.comparing(DocumentEntity::getName)).collect(Collectors.toList());
+        List<DocumentEntity> sortedDocuments = filteredDocuments.stream().distinct().sorted(Comparator.comparing(DocumentEntity::getName)).collect(Collectors.toList());
 
         //DataTransferObject
         List<DocumentMetaDataDto> documentMetaDataDTOs = convertDocumentEntitiesToDocumentMetaDataDtoList(sortedDocuments);
