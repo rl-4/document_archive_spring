@@ -6,6 +6,7 @@ import dhbw.demo.model.*;
 import dhbw.demo.text_search.FilterDocumentsByFullTextSearch;
 import dhbw.demo.text_search.FullTextSearch;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,7 +44,8 @@ public class MainController {
         HttpResponse<String> response;
         TextExtractionResultWrapper textExtractionResultWrapper = null;
         try {
-            response = httpSearch.search(new URI("localhost:8081/api/getTexts/" + ids + ""));
+            URI uri = new URI("http://localhost:8081/api/getTexts/" + ids);
+            response = httpSearch.search(uri);
             String json = response.body();
             textExtractionResultWrapper = parser.readJsonTextExtractionResultWrapper(json);
         } catch (Exception e) {
@@ -58,8 +60,6 @@ public class MainController {
         //fullTextSearchResult -> Select * From documents
         List<DocumentEntity> filteredDocuments = documentRepository.findByIdIn(filtered_document_ids);
 
-        //TODO literal match
-
         List<DocumentEntity> nameMatchingDocuments = getNameMatchingDocuments(regExMatch, searchQuery);
 
         filteredDocuments.addAll(nameMatchingDocuments);
@@ -67,7 +67,11 @@ public class MainController {
 
         //DataTransferObject
         List<DocumentMetaDataDto> documentMetaDataDTOs = convertDocumentEntitiesToDocumentMetaDataDtoList(sortedDocuments);
-        return ResponseEntity.ok(documentMetaDataDTOs);
+
+        HttpHeaders responseHeader = new HttpHeaders();
+        responseHeader.setContentType(MediaType.APPLICATION_JSON);
+
+        return ResponseEntity.ok().headers(responseHeader).body(documentMetaDataDTOs);
     }
 
     private List<DocumentEntity> getAllDocumentsMatchingKeyValuePairs(Map<String, String> keyValuePairs) {

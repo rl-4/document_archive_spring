@@ -1,13 +1,20 @@
 package dhbw.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Map;
 
 public class DocumentMetaDataDto {
-    private final String name;
+    @JsonProperty
+    private String name;
+    @JsonProperty
+    private String path;
+    @JsonProperty
+    private Map<String, String> metaData;
 
-    private final String path;
+    public DocumentMetaDataDto(){
 
-    private final Map<String, String> metaData;
+    }
 
     public DocumentMetaDataDto(String name, String path, Map<String, String> metaData) {
         this.name = name;
