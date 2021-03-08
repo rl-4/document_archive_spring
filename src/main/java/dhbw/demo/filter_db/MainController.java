@@ -4,6 +4,7 @@ import dhbw.demo.httpSearch.HttpSearch;
 import dhbw.demo.json.Parser;
 import dhbw.demo.model.*;
 import dhbw.demo.text_search.FilterDocumentsByFullTextSearch;
+import dhbw.demo.text_search.FullTextSearch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,10 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -45,7 +43,7 @@ public class MainController {
         HttpResponse<String> response;
         TextExtractionResultWrapper textExtractionResultWrapper = null;
         try {
-            response = httpSearch.search(new URI("localhost:8081/api/getTexts?ids=[" + ids + "]"));
+            response = httpSearch.search(new URI("localhost:8081/api/getTexts/" + ids + ""));
             String json = response.body();
             textExtractionResultWrapper = parser.readJsonTextExtractionResultWrapper(json);
         } catch (Exception e) {
@@ -59,8 +57,13 @@ public class MainController {
         //fullTextSearchResult -> Select * From documents
         List<DocumentEntity> filteredDocuments = documentRepository.findByIdIn(filtered_document_ids);
 
+        List<DocumentEntity> nameMatchingDocuments = this.documentRepository.findAll().stream().filter(document -> FullTextSearch.textMatchesRegExSubString(document.getName(), searchQuery)).collect(Collectors.toList());
+
+        filteredDocuments.addAll(nameMatchingDocuments);
+        List<DocumentEntity> sortedDocuments = filteredDocuments.stream().sorted(Comparator.comparing(DocumentEntity::getName)).collect(Collectors.toList());
+
         //DataTransferObject
-        return convertDocumentEntitiesToDocumentMetaDataDtoList(filteredDocuments);
+        return convertDocumentEntitiesToDocumentMetaDataDtoList(sortedDocuments);
     }
 
     private List<DocumentEntity> getAllDocumentsMatchingKeyValuePairs(Map<String, String> keyValuePairs) {
