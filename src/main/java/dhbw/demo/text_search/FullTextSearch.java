@@ -1,12 +1,15 @@
 package dhbw.demo.text_search;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FullTextSearch {
 
     public static boolean textMatchesRegExSubString(String text, String searchedString) {
         String regExString = WildcardEvaluator.createRegexForSubString(searchedString);
-        return text.matches(regExString);
+        Matcher matcher = Pattern.compile(regExString, Pattern.DOTALL).matcher(text);
+        return matcher.find();
     }
 
     public static boolean textContainsLiteralSubstring(String text, String searchedString) {
@@ -15,7 +18,8 @@ public class FullTextSearch {
 
     public static boolean textMatchesExactRegExString(String text, String searchedString) {
         String regExString = WildcardEvaluator.createRegExForExactMatch(searchedString);
-        return text.matches(regExString);
+        Matcher matcher = Pattern.compile(regExString, Pattern.DOTALL).matcher(text);
+        return matcher.find();
     }
 
 
