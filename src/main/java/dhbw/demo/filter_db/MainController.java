@@ -54,7 +54,7 @@ public class MainController {
 
         List<DocumentEntity> filteredDocuments = documentRepository.findByIdIn(filtered_document_ids);
 
-        List<DocumentEntity> nameMatchingDocuments = getNameMatchingDocuments(regExMatch, searchQuery);
+        List<DocumentEntity> nameMatchingDocuments = getNameMatchingDocuments(regExMatch, searchQuery, matchingDocuments);
 
         filteredDocuments.addAll(nameMatchingDocuments);
         List<DocumentEntity> sortedDocuments = filteredDocuments.stream().distinct().sorted(Comparator.comparing(DocumentEntity::getName)).collect(Collectors.toList());
@@ -91,11 +91,11 @@ public class MainController {
         return filteredDocuments.stream().map(this::convertDocumentEntityToDocumentMetaDataDto).collect(Collectors.toList());
     }
 
-    private List<DocumentEntity> getNameMatchingDocuments(boolean regExMatch, String searchQuery) {
+    private List<DocumentEntity> getNameMatchingDocuments(boolean regExMatch, String searchQuery, List<DocumentEntity> filteredDocuments) {
         if (regExMatch) {
-            return this.documentRepository.findAll().stream().filter(document -> FullTextSearch.textMatchesRegExSubString(document.getName(), searchQuery)).collect(Collectors.toList());
+            return filteredDocuments.stream().filter(document -> FullTextSearch.textMatchesRegExSubString(document.getName(), searchQuery)).collect(Collectors.toList());
         } else {
-            return this.documentRepository.findAll().stream().filter(document -> FullTextSearch.textContainsLiteralSubstring(document.getName(), searchQuery)).collect(Collectors.toList());
+            return filteredDocuments.stream().filter(document -> FullTextSearch.textContainsLiteralSubstring(document.getName(), searchQuery)).collect(Collectors.toList());
         }
     }
 }
