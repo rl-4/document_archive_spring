@@ -23,10 +23,10 @@ import java.util.stream.Collectors;
 public class MainController {
     private final HttpSearch httpSearch = new HttpSearch();
     private final Parser parser = new Parser();
+
     @Autowired
     private DocumentRepository documentRepository;
-    @Autowired
-    private MetaDataRepository metaDataRepository;
+
 
     @PostMapping(value = "/fullTextSearch", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<DocumentMetaDataDto>> getAllDocumentsMatchingKeyValuePairs(@RequestBody FilterQuery filterQuery) {
@@ -36,28 +36,22 @@ public class MainController {
 
         List<DocumentEntity> matchingDocuments = getAllDocumentsMatchingKeyValuePairs(keyValuePairs);
 
-        //send paths to TextExtractor
         MatchingDocumentsWrapper matchingDocumentsWrapper = mapMatchingDocumentsToMatchingDocumentsWrapper(matchingDocuments);
 
-        //get ids
         String ids = Arrays.stream(matchingDocumentsWrapper.matchingDocuments).map(matchingDocument -> String.valueOf(matchingDocument.document_id)).collect(Collectors.joining(","));
         HttpResponse<String> response;
-        TextExtractionResultWrapper textExtractionResultWrapper = null;
+        TextExtractionResultWrapper textExtractionResultWrapper;
         try {
             URI uri = new URI("http://fileservice:8081/api/getTexts/" + ids);
             response = httpSearch.search(uri);
             String json = response.body();
             textExtractionResultWrapper = parser.readJsonTextExtractionResultWrapper(json);
         } catch (Exception e) {
-            //TODO give back specific status code
             return ResponseEntity.badRequest().body(null);
         }
 
-        //fullTextSearch in TextExtractionResults
-        //-> ids
         int[] filtered_document_ids = FilterDocumentsByFullTextSearch.filterDocumentsByFullTextSearch(regExMatch, textExtractionResultWrapper, searchQuery);
 
-        //fullTextSearchResult -> Select * From documents
         List<DocumentEntity> filteredDocuments = documentRepository.findByIdIn(filtered_document_ids);
 
         List<DocumentEntity> nameMatchingDocuments = getNameMatchingDocuments(regExMatch, searchQuery);
@@ -65,7 +59,6 @@ public class MainController {
         filteredDocuments.addAll(nameMatchingDocuments);
         List<DocumentEntity> sortedDocuments = filteredDocuments.stream().distinct().sorted(Comparator.comparing(DocumentEntity::getName)).collect(Collectors.toList());
 
-        //DataTransferObject
         List<DocumentMetaDataDto> documentMetaDataDTOs = convertDocumentEntitiesToDocumentMetaDataDtoList(sortedDocuments);
 
         HttpHeaders responseHeader = new HttpHeaders();
@@ -76,9 +69,8 @@ public class MainController {
 
     private List<DocumentEntity> getAllDocumentsMatchingKeyValuePairs(Map<String, String> keyValuePairs) {
         Predicate<DocumentEntity> matchesKeyValuePairs = document -> keyValuePairs.entrySet().stream().allMatch(keyValuePair -> document.getMetaData().stream().anyMatch(metaDate -> metaDate.getKey().equals(keyValuePair.getKey()) && metaDate.getValue().equals(keyValuePair.getValue())));
-        List<DocumentEntity> matchingDocuments = documentRepository.findAll().stream().filter(matchesKeyValuePairs).collect(Collectors.toList());
 
-        return matchingDocuments;
+        return documentRepository.findAll().stream().filter(matchesKeyValuePairs).collect(Collectors.toList());
     }
 
     private MatchingDocumentsWrapper mapMatchingDocumentsToMatchingDocumentsWrapper(List<DocumentEntity> matchingDocuments) {
@@ -87,7 +79,6 @@ public class MainController {
             MatchingDocument matchingDocumentDto = new MatchingDocument(matchingDocument.getId(), matchingDocument.getPath());
             matchingDocumentDTOs.add(matchingDocumentDto);
         }
-        //TODO cast works?
         return new MatchingDocumentsWrapper(matchingDocumentDTOs.toArray(MatchingDocument[]::new));
     }
 

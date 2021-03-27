@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TestFullTextSearch {
-    //TODO tests for String[]
 
     @Test
     public void testTextMatchesRegExSubStringSingleChar() {

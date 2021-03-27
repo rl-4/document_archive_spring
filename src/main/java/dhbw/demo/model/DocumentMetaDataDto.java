@@ -12,7 +12,7 @@ public class DocumentMetaDataDto {
     @JsonProperty
     private Map<String, String> metaData;
 
-    public DocumentMetaDataDto(){
+    public DocumentMetaDataDto() {
 
     }
 

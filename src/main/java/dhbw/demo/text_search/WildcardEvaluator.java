@@ -2,7 +2,7 @@ package dhbw.demo.text_search;
 
 public class WildcardEvaluator {
     //b?ll -> exactly 1 char
-    //b*ll -> more then one chars
+    //b*ll -> at least one char
 
     public static String createRegExForExactMatch(String searchPattern) {
         return searchPattern.replace("?", ".").replace("*", ".+");

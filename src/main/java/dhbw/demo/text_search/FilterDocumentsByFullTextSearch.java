@@ -16,7 +16,6 @@ public class FilterDocumentsByFullTextSearch {
             String[] extractedCells = textExtractionResult.extractedCells;
 
             boolean textMatchesSearch;
-            //TODO refactor multiple if else
             if (extractedText != null) {
                 if (regExMatch) {
                     textMatchesSearch = FullTextSearch.textMatchesRegExSubString(extractedText, searchQuery);
